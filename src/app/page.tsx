@@ -1,7 +1,23 @@
 "use client";
 
+import localFont from "next/font/local";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+
+const diatypeExtendedBold = localFont({
+  src: "../fonts/ABCDiatypeExpanded-Bold-Trial.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
+});
+
+const gritRegular = localFont({
+  src: "../fonts/Grit-Regular.woff2",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+  variable: "--font-grit",
+});
 
 // Vertex Shader - Simple UV passthrough
 const vertexShader = `
@@ -82,21 +98,42 @@ export default function HomePage() {
     }
 
     console.log("Initializing WebGL video background...");
+    console.log("Video element:", video);
+    console.log("Video src:", video.querySelector("source")?.src);
 
     // Video event handlers for debugging
     const handleVideoLoad = () => {
-      console.log("Video loaded successfully");
+      console.log("Video loaded successfully - readyState:", video.readyState);
       setIsLoading(false);
     };
 
     const handleVideoError = (e: Event) => {
       console.error("Video failed to load:", e);
+      console.error("Video error code:", video.error?.code);
+      console.error("Video error message:", video.error?.message);
       setHasError(true);
       setIsLoading(false);
     };
 
+    const handleCanPlayThrough = () => {
+      console.log("Video can play through");
+      setIsLoading(false);
+    };
+
+    const handleLoadedMetadata = () => {
+      console.log("Video metadata loaded - duration:", video.duration);
+    };
+
     video.addEventListener("loadeddata", handleVideoLoad);
     video.addEventListener("error", handleVideoError);
+    video.addEventListener("canplaythrough", handleCanPlayThrough);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+
+    // Check if video is already loaded
+    if (video.readyState >= 2) {
+      console.log("Video already loaded (readyState:", video.readyState, ")");
+      setIsLoading(false);
+    }
 
     // Mobile fallback - show video directly without WebGL
     if (isTouchDevice) {
@@ -238,6 +275,8 @@ export default function HomePage() {
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("loadeddata", handleVideoLoad);
       video.removeEventListener("error", handleVideoError);
+      video.removeEventListener("canplaythrough", handleCanPlayThrough);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
 
       // Dispose Three.js resources
       geometry.dispose();
@@ -326,29 +365,93 @@ export default function HomePage() {
       )}
 
       {/* Your Content Goes Here */}
-      <div ref={containerRef} className="relative z-10">
-        {/* Hero Section */}
-        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
-              Your Headline
+      <div
+        ref={containerRef}
+        className="relative z-10 min-h-screen flex flex-col"
+      >
+        {/* Hero Section with RAGGED EDGE Text */}
+        <section className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-visible">
+          <div className="overflow-visible" style={{ padding: "0 10%" }}>
+            <h1
+              className={`${diatypeExtendedBold.className} text-white font-bold tracking-[0.15em] uppercase select-none whitespace-nowrap`}
+              style={{
+                // TWEAKABLE VALUES - Adjust these to fine-tune the look:
+                // scaleX: Horizontal stretch (1.0 = normal, 1.5 = very wide, 2.0 = ultra wide)
+                // scaleY: Vertical compression (1.0 = normal, 0.8 = shorter, 0.6 = very short)
+                // fontSize: Overall text size (clamp min, preferred, max values)
+                // letterSpacing: Space between letters (0.1em = tight, 0.2em = loose)
+                // padding: Horizontal room for stretched text ("0 5%" = less, "0 15%" = more)
+                fontSize: "clamp(2.5rem, 10vw, 8rem)",
+                letterSpacing: "0.1em",
+                lineHeight: "0.9",
+                fontWeight: "900",
+                transform: "scaleX(1.4) scaleY(0.75)",
+                transformOrigin: "center center",
+              }}
+            >
+              RAGGED EDGE
             </h1>
-            <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
-              Your subtitle goes here. Move your cursor to see the video
-              distortion effect.
-            </p>
           </div>
         </section>
 
-        {/* Additional sections */}
-        <section className="min-h-screen bg-white/5 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 py-24">
-            <h2 className="text-3xl font-bold text-white mb-8">About</h2>
-            <p className="text-white/70 leading-relaxed">
-              More content here...
-            </p>
+        {/* Bottom Navigation */}
+        <nav className="fixed bottom-6 left-0 right-0 mb-4 px-7 flex justify-between items-center z-20">
+          {/* Left Navigation */}
+          <div className="flex gap-1">
+            <a
+              href="#home"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${gritRegular.className} px-5 py-2.5 bg-white hover:bg-white text-black rounded-full text-sm transition-all duration-200`}
+            >
+              Home
+            </a>
+            <a
+              href="#partnerships"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${gritRegular.className} px-5 py-2.5 bg-white/75 hover:bg-white/90 text-black rounded-full text-sm transition-all duration-200`}
+            >
+              Partnerships
+            </a>
+            <a
+              href="#approach"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${gritRegular.className} px-5 py-2.5 bg-white/75 hover:bg-white/90 text-black rounded-full text-sm transition-all duration-200`}
+            >
+              Approach
+            </a>
+            <a
+              href="#happenings"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${gritRegular.className} px-5 py-2.5 bg-white/75 hover:bg-white/90 text-black rounded-full text-sm transition-all duration-200`}
+            >
+              Happenings
+            </a>
           </div>
-        </section>
+
+          {/* Right Navigation */}
+          <div className="flex gap-2">
+            <a
+              href="#join"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${gritRegular.className} px-5 py-2.5 bg-white/75 hover:bg-white/90 text-black rounded-full text-sm transition-all duration-200`}
+            >
+              Join
+            </a>
+            <a
+              href="#contact"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${gritRegular.className} px-5 py-2.5 bg-white/75 hover:bg-white/90 text-black rounded-full text-sm transition-all duration-200`}
+            >
+              Contact
+            </a>
+          </div>
+        </nav>
       </div>
     </main>
   );
