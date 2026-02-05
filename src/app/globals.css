@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0e0c0a;
+  --foreground: #f6efe6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.scene-root {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 4rem 6vw;
+}
+
+.scene-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+  z-index: 0;
+}
+
+.scene-canvas.hidden {
+  opacity: 0;
+}
+
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scene-asset {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.scene-content {
+  position: relative;
+  z-index: 2;
+  max-width: 48rem;
+  text-align: center;
+  display: grid;
+  gap: 1rem;
+}
+
+.opening-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.scene-content h1 {
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.scene-content p {
+  font-size: 1.05rem;
+  color: color-mix(in srgb, var(--foreground) 80%, transparent);
+}
+
+.scene-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+}
